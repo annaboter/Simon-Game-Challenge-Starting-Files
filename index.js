@@ -12,7 +12,7 @@ var gameOver = false;
 var gamePattern = [];
 var userClickedPattern = [];
 
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function() {
   startGame();
   computerTurn();
   userTurn();
@@ -22,11 +22,10 @@ function startGame() {
   if (gameStart) return;
   gameStart = true;
   // console.log('Game started');
-  document.getElementById("level-title").innerText = "Level " + gamePattern.length;
 };
 
-// after game starts, the user waits for the computer to make a move
 function computerTurn() {
+  document.getElementById("level-title").innerText = "Level " + (1 + gamePattern.length);
   var randomNumber = Math.floor(Math.random() * 4);
   var randomButton = buttons[randomNumber];
   gamePattern.push(randomButton.id);
@@ -36,6 +35,30 @@ function computerTurn() {
     randomButton.classList.remove('pressed');
   }, 200);
 };
+
+function userTurn() {
+  buttons.forEach(function(button) {
+    button.addEventListener("click", function() {
+      var userClickedButton = button.id;
+      userClickedPattern.push(userClickedButton);
+      if (userClickedPattern === gamePattern) {
+        userClickedButton.classList.add('pressed');
+        sounds[userClickedButton].play();
+        setTimeout(function() {
+          userClickedButton.classList.remove('pressed');
+        }, 200);
+        gameLoop();
+      } else {
+        gameOver = true;
+        sounds[5].play();
+        document.getElementById("level-title").innerText = "Game Over";
+        document.body.addClassList('game-over');
+      }
+    });
+  });
+};
+
+// after game starts, the user waits for the computer to make a move
 // the computer makes a move by randomly selecting a button
 // this button then makes the right sound and flashes according to the color
 // the button the computer click get added to the gamePattern array
